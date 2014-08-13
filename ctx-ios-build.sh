@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# COLOR_RED='\e[0;31m'
-# COLOR_GREEN='\e[0;32m'
-# NO_CCOLOR='\e[0m'
-
 COLOR_RED=$(tput setaf 1)
 COLOR_GOLD=$(tput setaf 178)
 COLOR_AZURE=$(tput setaf 33)
@@ -12,7 +8,9 @@ NORMAL=$(tput sgr0)
 
 echo "${COLOR_GOLD}Building a fat rabbitmq-c library for iOS platform...${NORMAL}"
 
-autoreconf --install --verbose --debug
+make maintainer-clean
+
+autoreconf --install --verbose
 
 echo "${COLOR_GREEN}Building i386 rabbitmq-c library for iOS Simulator...${NORMAL}"
 make clean
@@ -81,8 +79,9 @@ make
 lipo -info librabbitmq/.libs/librabbitmq.a
 mv librabbitmq/.libs/librabbitmq.a librabbitmq.a.arm64
 
-echo "${COLOR_GREEN}Merging libs...${NORMAL}"
-
 DEVROOT=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer
 $DEVROOT/usr/bin/lipo -arch armv7 librabbitmq.a.armv7 -arch armv7s librabbitmq.a.armv7s -arch i386 librabbitmq.a.i386 -arch arm64 librabbitmq.a.arm64 -arch x86_64 librabbitmq.a.x86_64 -create -output librabbitmq.a
-file librabbitmq.a
+
+tput setaf 28 # Set green output
+xcrun -sdk iphoneos lipo -info librabbitmq.a
+tput sgr0 # Set back to normal output
